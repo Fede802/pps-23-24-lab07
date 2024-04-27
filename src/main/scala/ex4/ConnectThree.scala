@@ -53,8 +53,26 @@ object ConnectThree extends App:
      case _ =>
         for
           game <- computeAnyGame(player.other, moves - 1)
-          newBoard <- placeAnyDisk(game.headOption.getOrElse(List()), player)
+          lastBoard = game.headOption.getOrElse(List())
+          if !won(lastBoard)
+          newBoard <- placeAnyDisk(lastBoard, player)
         yield newBoard +: game
+
+  def won(board: Board): Boolean =
+    val r = for
+        x <- 0 to bound
+        y <- 0 to bound
+        player = find(board, x, y)
+        if player.isDefined
+        if existWinningCombination(board, x, y, player.get)
+    yield true
+    r.contains(true)  //r.headOption.getOrElse(false)
+
+  def existWinningCombination(board: Board, x: Int, y: Int, player: Player): Boolean =
+    find(board, x + 1, y).contains(player) && find(board, x + 2, y).contains(player)
+    || find(board, x, y + 1).contains(player) && find(board, x, y + 2).contains(player)
+    || find(board, x + 1, y + 1).contains(player) && find(board, x + 2, y + 2).contains(player)
+    || find(board, x - 1, y + 1).contains(player) && find(board, x - 2, y + 2).contains(player)
 
   def printBoards(game: Seq[Board]): Unit =
     for
@@ -93,10 +111,13 @@ object ConnectThree extends App:
   // ...O ..XO .X.O X..O
   println("EX 4: ")
 // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  computeAnyGame(O, 4).foreach { g =>
+  var nGames = 0;
+  computeAnyGame(O, 6).foreach { g =>
     printBoards(g)
     println()
+    nGames = nGames + 1
   }
+  println(nGames)
 // .... .... .... .... O...
 // .... .... .... X... X...
 // .... .... O... O... O...
