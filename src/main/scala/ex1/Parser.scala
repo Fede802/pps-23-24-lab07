@@ -48,7 +48,7 @@ trait ShortenThenN[T](n: Int) extends Parser[T]:
     else
       false
 
-class ShortenThenNParser(chars: Set[Char]) extends BasicParser(chars) with NotTwoConsecutive[Char]
+class ShortenThenNParser(chars: Set[Char], n: Int) extends BasicParser(chars) with ShortenThenN[Char](n)
 
 @main def checkParsers(): Unit =
 
