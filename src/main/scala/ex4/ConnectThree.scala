@@ -49,11 +49,11 @@ object ConnectThree extends App:
     yield board :+ Disk(x, y.get, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
-    case 0 => LazyList(List())
-    case _ =>
+     case 0 => LazyList(List())
+     case _ =>
         for
           game <- computeAnyGame(player.other, moves - 1)
-          newBoard <- placeAnyDisk(game.head, player)
+          newBoard <- placeAnyDisk(game.headOption.getOrElse(List()), player)
         yield newBoard +: game
 
   def printBoards(game: Seq[Board]): Unit =
@@ -97,15 +97,19 @@ object ConnectThree extends App:
     printBoards(g)
     println()
   }
+// .... .... .... .... O...
+// .... .... .... X... X...
+// .... .... O... O... O...
+// .... X... X... X... X...
+//
+//
+//
 //  .... .... .... .... ...O
 //  .... .... .... ...X ...X
 //  .... .... ...O ...O ...O
 //  .... ...X ...X ...X ...X
 //
-//
-// .... .... .... .... O...
-// .... .... .... X... X...
-// .... .... O... O... O...
-// .... X... X... X... X...
+
+
 //
 //// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
