@@ -48,7 +48,13 @@ object ConnectThree extends App:
       if y.isDefined
     yield board :+ Disk(x, y.get, player)
 
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
+    case 0 => LazyList(List())
+    case _ =>
+        for
+          game <- computeAnyGame(player.other, moves - 1)
+          newBoard <- placeAnyDisk(game.head, player)
+        yield newBoard +: game
 
   def printBoards(game: Seq[Board]): Unit =
     for
@@ -74,7 +80,7 @@ object ConnectThree extends App:
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X)), 0)) // Some(2)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 0)) // Some(3)
   println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X), Disk(0, 3, X)), 0)) // None
-  // Exercise 2: implement placeAnyDisk such that..
+  // Exercise 3: implement placeAnyDisk such that..
   printBoards(placeAnyDisk(List(), X))
   // .... .... .... ....
   // .... .... .... ....
@@ -85,21 +91,21 @@ object ConnectThree extends App:
   // .... .... .... ....
   // ...X .... .... ....
   // ...O ..XO .X.O X..O
-//  println("EX 4: ")
-//// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-//  computeAnyGame(O, 4).foreach { g =>
-//    printBoards(g)
-//    println()
-//  }
-////  .... .... .... .... ...O
-////  .... .... .... ...X ...X
-////  .... .... ...O ...O ...O
-////  .... ...X ...X ...X ...X
-////
-////
-//// .... .... .... .... O...
-//// .... .... .... X... X...
-//// .... .... O... O... O...
-//// .... X... X... X... X...
+  println("EX 4: ")
+// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
+  computeAnyGame(O, 4).foreach { g =>
+    printBoards(g)
+    println()
+  }
+//  .... .... .... .... ...O
+//  .... .... .... ...X ...X
+//  .... .... ...O ...O ...O
+//  .... ...X ...X ...X ...X
+//
+//
+// .... .... .... .... O...
+// .... .... .... X... X...
+// .... .... O... O... O...
+// .... X... X... X... X...
 //
 //// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
