@@ -27,11 +27,26 @@ object ConnectThree extends App:
 
   import Player.*
 
-  def find(board: Board, x: Int, y: Int): Option[Player] = ???
+  def find(board: Board, x: Int, y: Int): Option[Player] =
+    val player = for
+      disk <- board
+      if disk.x == x && disk.y == y
+    yield disk.player
+    player.headOption
 
-  def firstAvailableRow(board: Board, x: Int): Option[Int] = ???
+  def firstAvailableRow(board: Board, x: Int): Option[Int] =
+    val freeY = for
+      y <- 0 to bound
+      if !board.exists(disk => disk.x == x && disk.y == y)
+    yield y
+    freeY.headOption
 
-  def placeAnyDisk(board: Board, player: Player): Seq[Board] = ???
+  def placeAnyDisk(board: Board, player: Player): Seq[Board] =
+    for
+      x <- 0 to bound
+      y = firstAvailableRow(board, x)
+      if y.isDefined
+    yield board :+ Disk(x, y.get, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = ???
 
@@ -65,26 +80,26 @@ object ConnectThree extends App:
   // .... .... .... ....
   // .... .... .... ....
   // ...X ..X. .X.. X...
-  printBoards(placeAnyDisk(List(Disk(0, 0, O)), X))
+  printBoards(placeAnyDisk(List(Disk(bound, 0, O)), X))
   // .... .... .... ....
   // .... .... .... ....
   // ...X .... .... ....
   // ...O ..XO .X.O X..O
-  println("EX 4: ")
-// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  computeAnyGame(O, 4).foreach { g =>
-    printBoards(g)
-    println()
-  }
-//  .... .... .... .... ...O
-//  .... .... .... ...X ...X
-//  .... .... ...O ...O ...O
-//  .... ...X ...X ...X ...X
+//  println("EX 4: ")
+//// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
+//  computeAnyGame(O, 4).foreach { g =>
+//    printBoards(g)
+//    println()
+//  }
+////  .... .... .... .... ...O
+////  .... .... .... ...X ...X
+////  .... .... ...O ...O ...O
+////  .... ...X ...X ...X ...X
+////
+////
+//// .... .... .... .... O...
+//// .... .... .... X... X...
+//// .... .... O... O... O...
+//// .... X... X... X... X...
 //
-//
-// .... .... .... .... O...
-// .... .... .... X... X...
-// .... .... O... O... O...
-// .... X... X... X... X...
-
-// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
+//// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
