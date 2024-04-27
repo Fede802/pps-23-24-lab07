@@ -1,5 +1,7 @@
 package ex1
 
+import java.util.Optional
+
 /** Consider the Parser example shown in previous lesson. Analogously to NonEmpty, create a mixin NotTwoConsecutive,
   * which adds the idea that one cannot parse two consecutive elements which are equal. Use it (as a mixin) to build
   * class NotTwoConsecutiveParser, used in the testing code at the end. Note we also test that the two mixins can work
@@ -28,9 +30,11 @@ trait NonEmpty[T] extends Parser[T]:
 class NonEmptyParser(chars: Set[Char]) extends BasicParser(chars) with NonEmpty[Char]
 
 trait NotTwoConsecutive[T] extends Parser[T]:
-  private[this] var lastToken: T = _
-  abstract override def parse(t: T): Boolean =
-    if lastToken != t then {lastToken = t; super.parse(t)} else false
+  private[this] var lastToken: Option[T] = None
+  abstract override def parse(t: T): Boolean = lastToken match
+    case Some(`t`) => false
+    case _ => lastToken = Some(t); super.parse(t)
+
 
 class NotTwoConsecutiveParser(chars: Set[Char]) extends BasicParser(chars) with NotTwoConsecutive[Char]
 
