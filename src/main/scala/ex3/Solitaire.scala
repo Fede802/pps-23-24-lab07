@@ -7,7 +7,7 @@ object Solitaire extends App:
   type Solution = Iterable[Position]
   type IterableFactory = Solution => Iterable[Solution]
   val width = 7
-  val height: Int = 5
+  val height = 5
   given IterableFactory = LazyList(_)
 
   def inside(position: (Int, Int)): Boolean =
@@ -17,23 +17,24 @@ object Solitaire extends App:
   def isSafe(position: Position, solution: Iterable[Position]): Boolean =
     !solution.exists(p => p == position) && inside(position)
 
-  def placeMarks(markPlaced: Int = 0, grid: List[Position] = List())(using factory: IterableFactory): Iterable[Solution] = markPlaced match
-  case 0 => placeMarks(1, List((width / 2, height / 2)))
-  case n if n == width*height => factory(grid)
-  case _ =>
-    for
-      move <- List((-3, 0), (3, 0), (0, -3), (0, 3), (2, 2), (-2, -2), (2, -2), (-2, 2))
-      lastMarkPosition = grid.head
-      newMarkPosition = (lastMarkPosition._1 + move._1, lastMarkPosition._2 + move._2)
-      if isSafe(newMarkPosition, grid)
-      solution <- placeMarks(markPlaced + 1, newMarkPosition :: grid)
-    yield
-      solution
+  def placeMarks(): Iterable[Solution] =
+    def _placeMarks(grid: List[Position] = List())(using factory: IterableFactory): Iterable[Solution] = grid.length match
+      case n if n == width*height => factory(grid)
+      case _ =>
+        for
+          move <- List((-3, 0), (3, 0), (0, -3), (0, 3), (2, 2), (-2, -2), (2, -2), (-2, 2))
+          lastMarkPosition = grid.head
+          newMarkPosition = (lastMarkPosition._1 + move._1, lastMarkPosition._2 + move._2)
+          if isSafe(newMarkPosition, grid)
+          solution <- _placeMarks(newMarkPosition :: grid)
+        yield
+          solution
+    _placeMarks(List((width / 2, height / 2)))
 
   def render(solution: Seq[(Int, Int)], width: Int, height: Int): String =
     val reversed = solution.reverse
     val rows =
-      for y <- 0 until height 
+      for y <- 0 until height
         row = for x <- 0 until width
         number = reversed.indexOf((x, y)) + 1
         yield if number > 0 then "%-2d ".format(number) else "X  "
