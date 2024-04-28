@@ -86,17 +86,44 @@ object ConnectThree extends App:
       yield Disk(x, y.get, player)
     moves.headOption.map(m => board :+ m).getOrElse(board)
 
-//  def smartAI(board: Board, player: Player): Board =
-//    val columns = Random.shuffle(0 to bound).toList
-//    val moves =
-//      for
-//        x <- columns
-//        y = firstAvailableRow(board, x)
-//        if y.isDefined
-//        newBoard = board :+ Disk(x, y.get, player)
-//        if !won(newBoard)
-//      yield newBoard
-//    moves.headOption.getOrElse(board)
+  def generateMoves(board: Board, player: Player): Seq[Board] =
+    for
+      x <- 0 to bound
+      y = firstAvailableRow(board, x)
+      if y.isDefined
+    yield board :+ Disk(x, y.get, player)
+
+  def minimax(board: Board, maxPlayer: Boolean, depth: Int): (Int, Board) = (board, depth) match
+    case (board, _) if won(board) => if maxPlayer then (1, board) else (-1, board)
+    case (_, 0) => (0, board)
+    case _ =>
+      var bestMove = board
+      if maxPlayer then
+        var maxEval = Int.MinValue
+        for
+          newBoard <- generateMoves(board, X)
+        do
+          val eval = minimax(newBoard, false, depth - 1)
+          val newEval = Math.max(maxEval, eval._1)
+            if newEval > maxEval then
+                maxEval = newEval
+                bestMove = newBoard
+        (maxEval, bestMove)
+      else
+        var minEval = Int.MaxValue
+        for
+          newBoard <- generateMoves(board, O)
+        do
+          val eval = minimax(newBoard, true, depth - 1)
+          val newEval = Math.min(minEval, eval._1)
+            if newEval < minEval then
+                minEval = newEval
+                bestMove = newBoard
+        (minEval, bestMove)
+
+  def smartAI(board: Board): Board =
+    val (_, newBoard) = minimax(board, true, 5)
+    newBoard
 
   def printBoards(game: Seq[Board]): Unit =
     for
