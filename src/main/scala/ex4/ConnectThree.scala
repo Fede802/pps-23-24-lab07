@@ -1,6 +1,7 @@
 package ex4
 
 import java.util.OptionalInt
+import scala.util.Random
 
 // Optional!
 object ConnectThree extends App:
@@ -74,6 +75,29 @@ object ConnectThree extends App:
     || find(board, x + 1, y + 1).contains(player) && find(board, x + 2, y + 2).contains(player)
     || find(board, x - 1, y + 1).contains(player) && find(board, x - 2, y + 2).contains(player)
 
+  Random.setSeed(1234)
+  def randomAI(board: Board, player: Player): Board =
+    val columns = Random.shuffle(0 to bound).toList
+    val moves =
+      for
+        x <- columns
+        y = firstAvailableRow(board, x)
+        if y.isDefined
+      yield Disk(x, y.get, player)
+    moves.headOption.map(m => board :+ m).getOrElse(board)
+
+//  def smartAI(board: Board, player: Player): Board =
+//    val columns = Random.shuffle(0 to bound).toList
+//    val moves =
+//      for
+//        x <- columns
+//        y = firstAvailableRow(board, x)
+//        if y.isDefined
+//        newBoard = board :+ Disk(x, y.get, player)
+//        if !won(newBoard)
+//      yield newBoard
+//    moves.headOption.getOrElse(board)
+
   def printBoards(game: Seq[Board]): Unit =
     for
       y <- bound to 0 by -1
@@ -112,7 +136,7 @@ object ConnectThree extends App:
   println("EX 4: ")
 // Exercise 3 (ADVANCED!): implement computeAnyGame such that..
   var nGames = 0;
-  computeAnyGame(O, 6).foreach { g =>
+  computeAnyGame(O, 4).foreach { g =>
     printBoards(g)
     println()
     nGames = nGames + 1
