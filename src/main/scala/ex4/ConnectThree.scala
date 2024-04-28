@@ -122,7 +122,7 @@ object ConnectThree extends App:
         (minEval, bestMove)
 
   def smartAI(board: Board): Board =
-    val (_, newBoard) = minimax(board, true, 5)
+    val (_, newBoard) = minimax(board, true, 12)
     newBoard
 
   def printBoards(game: Seq[Board]): Unit =
@@ -181,6 +181,16 @@ object ConnectThree extends App:
 //  .... .... ...O ...O ...O
 //  .... ...X ...X ...X ...X
 //
+  def play(): Unit =
+    var board: Board = Seq[Disk]()
+    var turn = false
+    while (!won(board))
+      if turn
+        then board = smartAI(board)
+        else board = randomAI(board, O)
+      turn = !turn
+      printBoards(Seq(board))
+  play()
 
 
 //
