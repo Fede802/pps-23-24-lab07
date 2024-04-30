@@ -1,6 +1,5 @@
 package ex4
 
-import java.util.OptionalInt
 import scala.util.Random
 
 // Optional!
@@ -94,35 +93,47 @@ object ConnectThree extends App:
     yield board :+ Disk(x, y.get, player)
 
   def minimax(board: Board, maxPlayer: Boolean, depth: Int): (Int, Board) = (board, depth) match
-    case (board, _) if won(board) => if maxPlayer then (1, board) else (-1, board)
+    case (board, _) if won(board) => if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, board)
     case _ =>
       var bestMove = board
       if maxPlayer then
         var maxEval = Int.MinValue
+        println(s"depth: ${depth} MAX startEval")
         for
           newBoard <- generateMoves(board, X)
         do
+          printBoards(Seq(newBoard))
           val eval = minimax(newBoard, false, depth - 1)
+          println(s"returned ${eval._1}")
           val newEval = Math.max(maxEval, eval._1)
             if newEval > maxEval then
                 maxEval = newEval
                 bestMove = newBoard
+
+        println(s"depth: ${depth} MAX maxEval: ${maxEval}")
+        printBoards(Seq(bestMove))
+        println(s"depth: ${depth} MAX endEval")
         (maxEval, bestMove)
       else
         var minEval = Int.MaxValue
+        println(s"depth: ${depth} MIN startEval")
         for
           newBoard <- generateMoves(board, O)
         do
+          printBoards(Seq(newBoard))
           val eval = minimax(newBoard, true, depth - 1)
           val newEval = Math.min(minEval, eval._1)
             if newEval < minEval then
                 minEval = newEval
                 bestMove = newBoard
+        println(s"depth: ${depth} MIN minEval: ${minEval}")
+        printBoards(Seq(bestMove))
+        println(s"depth: ${depth} MIN endEval")
         (minEval, bestMove)
 
-  def smartAI(board: Board): Board =
-    val (_, newBoard) = minimax(board, true, 12)
+  def smartAI(board: Board, maxPlayer: Boolean): Board =
+    val (_, newBoard) = minimax(board, maxPlayer, 4)
     newBoard
 
   def printBoards(game: Seq[Board]): Unit =
@@ -141,6 +152,8 @@ object ConnectThree extends App:
   println(find(List(Disk(0, 0, X)), 0, 0)) // Some(X)
   println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 0, 1)) // Some(O)
   println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 1, 1)) // None
+
+
 
   // Exercise 2: implement firstAvailableRow such that..
   println("EX 2: ")
@@ -181,15 +194,18 @@ object ConnectThree extends App:
 //  .... .... ...O ...O ...O
 //  .... ...X ...X ...X ...X
 //
+  printBoards(List(Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O)))) // None
   def play(): Unit =
-    var board: Board = Seq[Disk]()
-    var turn = false
+    var board: Board = Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O))
+    var turn = true
     while (!won(board))
+      println("START TURN")
       if turn
-        then board = smartAI(board)
-        else board = randomAI(board, O)
+        then {printBoards(Seq(board));board = smartAI(board, true)}
+        else {printBoards(Seq(board));board = smartAI(board, false)}
       turn = !turn
       printBoards(Seq(board))
+      println("END TURN")
   play()
 
 
