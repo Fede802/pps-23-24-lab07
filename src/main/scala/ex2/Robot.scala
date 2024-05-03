@@ -93,16 +93,3 @@ class RobotRepeated(val robot: Robot, val numberOfRepetition: Int = 0) extends R
     for
       _ <- 0 until numberOfRepetition
     do robot.act()
-
-
-@main def testRobot(): Unit =
-  val robot = LoggingRobot(SimpleRobot((0, 0), Direction.North))
-  robot.act() // robot at (0, 1) facing North
-  robot.turn(robot.direction.turnRight) // robot at (0, 1) facing East
-  robot.act() // robot at (1, 1) facing East
-  robot.act() // robot at (2, 1) facing East
-  val robot2 = RobotWithBattery(SimpleRobot((0, 0), Direction.North),10)
-  robot2.act()
-  val robot3 = RobotRepeated(SimpleRobot((0, 0), Direction.North),3)
-  robot3.act()
-  println(robot3.position)

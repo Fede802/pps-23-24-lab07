@@ -87,7 +87,7 @@ class RobotTest extends AnyFlatSpec with Matchers:
     val robot = new RobotRepeated(new SimpleRobot((0, 0), Direction.North), 2)
 
     robot.turn(Direction.East)
-    robot.direction should be(Direction.South)
+    robot.direction should be(Direction.East)
 
 
 
