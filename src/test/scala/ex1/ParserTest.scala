@@ -3,7 +3,7 @@ package ex1
 import ex1.*
 import org.scalatest.matchers.should.Matchers.*
 
-class ParserTests extends org.scalatest.funsuite.AnyFunSuite:
+class ParserTest extends org.scalatest.funsuite.AnyFunSuite:
   def parser = new BasicParser(Set('a', 'b', 'c'))
   // Note NonEmpty being "stacked" on to a concrete class
   // Bottom-up decorations: NonEmptyParser -> NonEmpty -> BasicParser -> Parser

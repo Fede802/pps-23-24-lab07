@@ -206,7 +206,10 @@ object ConnectThree extends App:
       turn = !turn
       printBoards(Seq(board))
       println("END TURN")
-  play()
+//  play()
+
+//  .... .... .... .... ...O
+ 
 
 
 //

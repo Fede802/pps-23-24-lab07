@@ -28,7 +28,6 @@ class SimpleRobot(var position: Position, var direction: Direction) extends Robo
     case Direction.East => (position._1 + 1, position._2)
     case Direction.South => (position._1, position._2 - 1)
     case Direction.West => (position._1 - 1, position._2)
-
   override def toString: String = s"robot at $position facing $direction"
 
 class DumbRobot(val robot: Robot) extends Robot:
@@ -67,8 +66,10 @@ class RobotWithBattery(val robot: Robot, private var _batteryUsage: Int = 0, pri
 
 class RobotCanFail(val robot: Robot, val failProbability: Double = 0, val seed: Int = 1234) extends Robot:
   export robot.{position, direction}
+
   import scala.util.Random
   private val random = Random(seed)
+
   private def available: Boolean =
     random.nextDouble()*100 > failProbability
 
@@ -86,12 +87,12 @@ class RobotRepeated(val robot: Robot, val numberOfRepetition: Int = 0) extends R
   override def turn(dir: Direction): Unit =
     for
       _ <- 0 until numberOfRepetition
-    yield robot.turn(dir)
+    do robot.turn(dir)
 
   override def act(): Unit =
     for
       _ <- 0 until numberOfRepetition
-    yield robot.act()
+    do robot.act()
 
 
 @main def testRobot(): Unit =
