@@ -99,25 +99,25 @@ object ConnectThree extends App:
       var bestMove = board
       if maxPlayer then
         var maxEval = Int.MinValue
-        println(s"depth: ${depth} MAX startEval")
+//        println(s"depth: ${depth} MAX startEval")
         for
           newBoard <- generateMoves(board, X)
         do
           printBoards(Seq(newBoard))
           val eval = minimax(newBoard, false, depth - 1)
-          println(s"returned ${eval._1}")
+//          println(s"returned ${eval._1}")
           val newEval = Math.max(maxEval, eval._1)
             if newEval > maxEval then
                 maxEval = newEval
                 bestMove = newBoard
 
-        println(s"depth: ${depth} MAX maxEval: ${maxEval}")
+//        println(s"depth: ${depth} MAX maxEval: ${maxEval}")
         printBoards(Seq(bestMove))
-        println(s"depth: ${depth} MAX endEval")
+//        println(s"depth: ${depth} MAX endEval")
         (maxEval, bestMove)
       else
         var minEval = Int.MaxValue
-        println(s"depth: ${depth} MIN startEval")
+//        println(s"depth: ${depth} MIN startEval")
         for
           newBoard <- generateMoves(board, O)
         do
@@ -127,9 +127,9 @@ object ConnectThree extends App:
             if newEval < minEval then
                 minEval = newEval
                 bestMove = newBoard
-        println(s"depth: ${depth} MIN minEval: ${minEval}")
+//        println(s"depth: ${depth} MIN minEval: ${minEval}")
         printBoards(Seq(bestMove))
-        println(s"depth: ${depth} MIN endEval")
+//        println(s"depth: ${depth} MIN endEval")
         (minEval, bestMove)
 
   def smartAI(board: Board, maxPlayer: Boolean): Board =
@@ -195,22 +195,45 @@ object ConnectThree extends App:
 //  .... ...X ...X ...X ...X
 //
   printBoards(List(Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O)))) // None
+  import IOs.*
+
+  def autoplay(): Unit =
+    var board: Board = Seq()
+    var turn = true
+    while (!won(board))
+      println("START TURN")
+      if turn
+      then {printBoards(Seq(board)); board = smartAI(board, true)}
+      else {printBoards(Seq(board)); board = smartAI(board, false)}
+      turn = !turn
+      printBoards(Seq(board))
+      println("END TURN")
+  autoplay()
   def play(): Unit =
-    var board: Board = Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O))
+    var board: Board = Seq()
     var turn = true
     while (!won(board))
       println("START TURN")
       if turn
         then {printBoards(Seq(board));board = smartAI(board, true)}
-        else {printBoards(Seq(board));board = smartAI(board, false)}
+        else
+          printBoards(Seq(board))
+          var validMove = false
+          var x = -1
+          var y = -1
+          while (!validMove)
+            println("Enter x:")
+            x = scala.io.StdIn.readLine().toInt - 1
+            val opy = firstAvailableRow(board, x)
+            if opy.isDefined
+              then {validMove = true; y = opy.get}
+              else println("Invalid move")
+          board = board :+ Disk(x, y, O)
       turn = !turn
       printBoards(Seq(board))
       println("END TURN")
-//  play()
+  play()
 
 //  .... .... .... .... ...O
- 
-
-
 //
 //// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
