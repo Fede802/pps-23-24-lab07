@@ -14,18 +14,6 @@ object Model:
       case X => O
       case _ => X
 
-  trait ConnectThree:
-    def find(x: Int, y: Int): Option[Player]
-    def firstAvailableRow(x: Int): Option[Int]
-    def placeAnyDisk(player: Player): Seq[Board]
-    def won: Boolean
-    def randomAI(player: Player): Board
-    def smartAI(player: Player): Board
-    def generateMoves(player: Player): Seq[Board]
-    def minimax(maxPlayer: Boolean, player: Player, depth: Int): (Int, Board)
-    def printBoards(): Unit
-    def boardInfo: String
-
   case class Disk(x: Int, y: Int, player: Player)
   /**
    * Board:
@@ -117,37 +105,27 @@ object Model:
       var bestMove = board
       if maxPlayer then
         var maxEval = Int.MinValue
-//        println(s"depth: ${depth} MAX startEval")
         for
           newBoard <- generateMoves(board, player)
         do
-          printBoards(Seq(newBoard))
           val eval = minimax(newBoard, false, player.other, depth - 1)
-//          println(s"returned ${eval._1}")
           val newEval = Math.max(maxEval, eval._1)
             if newEval > maxEval then
                 maxEval = newEval
                 bestMove = newBoard
-
-//        println(s"depth: ${depth} MAX maxEval: ${maxEval}")
         printBoards(Seq(bestMove))
-//        println(s"depth: ${depth} MAX endEval")
         (maxEval, bestMove)
       else
         var minEval = Int.MaxValue
-//        println(s"depth: ${depth} MIN startEval")
         for
           newBoard <- generateMoves(board, player)
         do
-          printBoards(Seq(newBoard))
           val eval = minimax(newBoard, true, player.other, depth - 1)
           val newEval = Math.min(minEval, eval._1)
             if newEval < minEval then
                 minEval = newEval
                 bestMove = newBoard
-//        println(s"depth: ${depth} MIN minEval: ${minEval}")
         printBoards(Seq(bestMove))
-//        println(s"depth: ${depth} MIN endEval")
         (minEval, bestMove)
 
   def smartAI(board: Board, player: Player): Board =
@@ -155,15 +133,7 @@ object Model:
     newBoard
 
   def printBoards(game: Seq[Board]): Unit =
-    for
-      y <- bound to 0 by -1
-      board <- game.reverse
-      x <- 0 to bound
-    do
-      print(find(board, x, y).map(_.toString).getOrElse("."))
-      if x == bound then
-        print(" ")
-        if board == game.head then println()
+    println(boardInfo(game))
 
   def boardInfo(game: Seq[Board]): String =
     var info = ""
@@ -177,5 +147,3 @@ object Model:
         info += " "
         if board == game.head then info += "\n"
     info
-
-
