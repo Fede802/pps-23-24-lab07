@@ -1,8 +1,6 @@
 package ex4
 
-import ex4.controller.ControllerImpl
-import view.FrameImpl
+import ex4.view.View
 
-
-@main def runMatchFour =
-  FrameImpl(ControllerImpl())
+@main def runConnectThree =
+  View.showMenu()

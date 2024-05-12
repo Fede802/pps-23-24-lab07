@@ -1,42 +1,38 @@
 package ex4.controller
 
-import ex4.model.{ConnectThree, Player}
-import ex4.model.ConnectThree.{Board, Disk, firstAvailableRow, printBoards, randomAI, smartAI, won}
-import ex4.view.menu.GameType
-
-trait Controller:
-  def setupGame(gameType: GameType): Unit
-  def updateGame(column: Int): Unit
-  def firstAvailableRow(column: Int): Option[Int]
-  def currentPlayer(): Player
-  def find(x: Int, y: Int): Option[Player]
+import ex4.model.Model
+import ex4.model.Model.{Board, Disk, GameType, Player, firstAvailableRow, printBoards, randomAI, smartAI, won}
 
 
-class ControllerImpl extends Controller{
+object Controller:
 
-  private var autoUpdate = () => ()
+  private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
   private var board: Board = Seq[Disk]()
+  private var autoUpdate = switchPlayer
   private var _currentPlayer = Player.X
 
   def setupGame(gameType: GameType): Unit =
     board = Seq()
     gameType match
-      case GameType.RANDOM => {println("Random game"); autoUpdate = () => randomAI(board, _currentPlayer)}
-      case GameType.SMART => {println("Smart game"); autoUpdate = () => smartAI(board, _currentPlayer)}
-      case GameType.MULTIPLAYER => {println("Multiplayer game"); autoUpdate = () => ()}
+      case GameType.RANDOM => {println("Random game"); autoUpdate = () => randomAI(board, _currentPlayer.other)}
+      case GameType.SMART => {println("Smart game"); autoUpdate = () => smartAI(board, _currentPlayer.other)}
+      case GameType.MULTIPLAYER => {println("Multiplayer game"); autoUpdate = switchPlayer}
 
   def updateGame(column: Int): Unit = {
-    val row = ConnectThree.firstAvailableRow(board, column).get
+    val row = Model.firstAvailableRow(board, column).get
     board = board :+ Disk(column, row, _currentPlayer)
-    _currentPlayer = _currentPlayer.other()
-    autoUpdate()
+    board = autoUpdate()
   }
 
-  def firstAvailableRow(column: Int): Option[Int] = ConnectThree.firstAvailableRow(board, column)
+  def firstAvailableRow(column: Int): Option[Int] = Model.firstAvailableRow(board, column)
 
   def currentPlayer(): Player = _currentPlayer
 
-  override def find(x: Int, y: Int): Option[Player] = ConnectThree.find(board,x, y)
+  def find(x: Int, y: Int): Option[Player] = Model.find(board,x, y)
+
+  def won(): Boolean = Model.won(board)
+
+  def boardInfo: String = Model.boardInfo(Seq(board))
 //  def autoplay(): Unit =
 //    var board: Board = Seq()
 //    var turn = true
@@ -87,4 +83,4 @@ class ControllerImpl extends Controller{
 
 //  play()
 
-}
+//}

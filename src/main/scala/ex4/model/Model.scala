@@ -1,15 +1,30 @@
 package ex4.model
-//
+
 import scala.util.Random
-//
-//// Optional!
-object ConnectThree extends App:
+
+object Model:
   val bound = 3
-//  enum Player:
-//    case X, O
-//    def other: Player = this match
-//      case X => O
-//      case _ => X
+
+  enum GameType:
+    case RANDOM, SMART, MULTIPLAYER
+
+  enum Player:
+    case X, O
+    def other: Player = this match
+      case X => O
+      case _ => X
+
+  trait ConnectThree:
+    def find(x: Int, y: Int): Option[Player]
+    def firstAvailableRow(x: Int): Option[Int]
+    def placeAnyDisk(player: Player): Seq[Board]
+    def won: Boolean
+    def randomAI(player: Player): Board
+    def smartAI(player: Player): Board
+    def generateMoves(player: Player): Seq[Board]
+    def minimax(maxPlayer: Boolean, player: Player, depth: Int): (Int, Board)
+    def printBoards(): Unit
+    def boardInfo: String
 
   case class Disk(x: Int, y: Int, player: Player)
   /**
@@ -35,11 +50,14 @@ object ConnectThree extends App:
     player.headOption
 
   def firstAvailableRow(board: Board, x: Int): Option[Int] =
-    val freeY = for
-      y <- 0 to bound
-      if !board.exists(disk => disk.x == x && disk.y == y)
-    yield y
-    freeY.headOption
+    var freeY = Option.empty[Int]
+    if x >= 0 && x <= bound
+      then freeY =
+        (for
+          y <- 0 to bound
+          if !board.exists(disk => disk.x == x && disk.y == y)
+        yield y).headOption
+    freeY
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] =
     for
@@ -52,7 +70,7 @@ object ConnectThree extends App:
      case 0 => LazyList(List())
      case _ =>
         for
-          game <- computeAnyGame(player.other(), moves - 1)
+          game <- computeAnyGame(player.other, moves - 1)
           lastBoard = game.headOption.getOrElse(List())
           if !won(lastBoard)
           newBoard <- placeAnyDisk(lastBoard, player)
@@ -147,67 +165,17 @@ object ConnectThree extends App:
         print(" ")
         if board == game.head then println()
 
-  // Exercise 1: implement find such that..
-  println("EX 1: ")
-  println(find(List(Disk(0, 0, X)), 0, 0)) // Some(X)
-  println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 0, 1)) // Some(O)
-  println(find(List(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X)), 1, 1)) // None
+  def boardInfo(game: Seq[Board]): String =
+    var info = ""
+    for
+      y <- bound to 0 by -1
+      board <- game.reverse
+      x <- 0 to bound
+    do
+      info += find(board, x, y).map(_.toString).getOrElse(".")
+      if x == bound then
+        info += " "
+        if board == game.head then info += "\n"
+    info
 
 
-
-  // Exercise 2: implement firstAvailableRow such that..
-  println("EX 2: ")
-  println(firstAvailableRow(List(), 0)) // Some(0)
-  println(firstAvailableRow(List(Disk(0, 0, X)), 0)) // Some(1)
-  println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X)), 0)) // Some(2)
-  println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X)), 0)) // Some(3)
-  println(firstAvailableRow(List(Disk(0, 0, X), Disk(0, 1, X), Disk(0, 2, X), Disk(0, 3, X)), 0)) // None
-  // Exercise 3: implement placeAnyDisk such that..
-  printBoards(placeAnyDisk(List(), X))
-  // .... .... .... ....
-  // .... .... .... ....
-  // .... .... .... ....
-  // ...X ..X. .X.. X...
-  printBoards(placeAnyDisk(List(Disk(bound, 0, O)), X))
-  // .... .... .... ....
-  // .... .... .... ....
-  // ...X .... .... ....
-  // ...O ..XO .X.O X..O
-  println("EX 4: ")
-// Exercise 3 (ADVANCED!): implement computeAnyGame such that..
-  var nGames = 0;
-  computeAnyGame(O, 4).foreach { g =>
-    printBoards(g)
-    println()
-    nGames = nGames + 1
-  }
-  println(nGames)
-// .... .... .... .... O...
-// .... .... .... X... X...
-// .... .... O... O... O...
-// .... X... X... X... X...
-//
-//
-//
-//  .... .... .... .... ...O
-//  .... .... .... ...X ...X
-//  .... .... ...O ...O ...O
-//  .... ...X ...X ...X ...X
-//
-  printBoards(List(Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O)))) // None
-
-
-
-
-//  def readInput(board: Board): (Int, Int) =
-//    (for
-//      in <- scala.io.StdIn.readLine()
-//      x = if in.toString.toIntOption.isDefined then in.toInt - 1 else readInput(board)._1
-//      y = firstAvailableRow(board, x)
-//      if !y.isDefined then readInput(board)
-//    yield (x, y.get)).head
-
-
-////  .... .... .... .... ...O
-////
-////// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
