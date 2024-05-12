@@ -89,33 +89,24 @@ object Model:
       if y.isDefined
     yield board :+ Disk(x, y.get, player)
 
+  private def evaluate(board: Board, player: Player, evalFunction: Board => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, Board) =
+    var bestMove = board
+    var bestEval = startEval
+    for newBoard <- generateMoves(board, player) do
+      val eval = evalFunction(newBoard)
+      if compare(eval, bestEval) then {bestEval = eval; bestMove = newBoard}
+    (bestEval, bestMove)
+
   def minimax(board: Board, maxPlayer: Boolean, player: Player, depth: Int): (Int, Board) = (board, depth) match
     case (board, _) if won(board) => if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, board)
     case _ =>
-      var bestMove = board
+      val evalFunction = (newBoard: Board) => minimax(newBoard, !maxPlayer, player.other, depth - 1)._1
+      val evaluationSetup = evaluate(board, player, evalFunction)
       if maxPlayer then
-        var maxEval = Int.MinValue
-        for
-          newBoard <- generateMoves(board, player)
-        do
-          val eval = minimax(newBoard, false, player.other, depth - 1)
-          val newEval = Math.max(maxEval, eval._1)
-            if newEval > maxEval then
-                maxEval = newEval
-                bestMove = newBoard
-        (maxEval, bestMove)
+        evaluationSetup(Int.MinValue, _ > _)
       else
-        var minEval = Int.MaxValue
-        for
-          newBoard <- generateMoves(board, player)
-        do
-          val eval = minimax(newBoard, true, player.other, depth - 1)
-          val newEval = Math.min(minEval, eval._1)
-            if newEval < minEval then
-                minEval = newEval
-                bestMove = newBoard
-        (minEval, bestMove)
+        evaluationSetup(Int.MaxValue, _ < _)
 
   def smartAI(board: Board, player: Player): Board =
     val (_, newBoard) = minimax(board, true, player, 4)

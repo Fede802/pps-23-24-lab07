@@ -35,35 +35,27 @@ object GameBoard:
       y <- 0 to bound
       if gameBoard.available(x, y)
     yield gameBoard.add(x, y, player)
-
+    
+  private def evaluate(gameBoard: GameBoard, player: Player, evalFunction: GameBoard => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, GameBoard) =
+    var bestMove = gameBoard
+    var bestEval = startEval
+    for newBoard <- generateMoves(gameBoard, player) do
+      val eval = evalFunction(newBoard)
+      if compare(eval, bestEval) then {bestEval = eval; bestMove = newBoard}
+    (bestEval, bestMove)
+  
   def minimax(gameBoard: GameBoard, maxPlayer: Boolean, player: Player, depth: Int): (Int, GameBoard) = (gameBoard, depth) match
     case (board, _) if board.won => if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, gameBoard)
-    case _ =>
-      var bestMove = gameBoard
+    case _ => 
+      val evalFunction = (newBoard: GameBoard) => minimax(newBoard, !maxPlayer, player.other, depth - 1)._1
+      val evaluationSetup = evaluate(gameBoard, player, evalFunction)
       if maxPlayer then
-        var maxEval = Int.MinValue
-        for
-          newBoard <- generateMoves(gameBoard, player)
-        do
-          val eval = minimax(newBoard, false, player.other, depth - 1)
-          val newEval = Math.max(maxEval, eval._1)
-          if newEval > maxEval then
-            maxEval = newEval
-            bestMove = newBoard
-        (maxEval, bestMove)
+        evaluationSetup(Int.MinValue, _ > _)
       else
-        var minEval = Int.MaxValue
-        for
-          newBoard <- generateMoves(gameBoard, player)
-        do
-          val eval = minimax(newBoard, true, player.other, depth - 1)
-          val newEval = Math.min(minEval, eval._1)
-          if newEval < minEval then
-            minEval = newEval
-            bestMove = newBoard
-        (minEval, bestMove)
-
+        evaluationSetup(Int.MaxValue, _ < _)  
+      
+  
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
     val (_, newBoard) = minimax(gameBoard, true, player, 10)
     newBoard
