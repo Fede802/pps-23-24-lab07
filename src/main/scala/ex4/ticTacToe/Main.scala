@@ -1,5 +1,6 @@
 package ex4.ticTacToe
 
-class Main {
+import ex4.ticTacToe.view.View
 
-}
+@main def runConnectThree =
+  View.showMenu()
