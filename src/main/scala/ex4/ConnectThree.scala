@@ -209,6 +209,8 @@ object ConnectThree extends App:
       printBoards(Seq(board))
       println("END TURN")
   autoplay()
+
+
   def play(): Unit =
     var board: Board = Seq()
     var turn = true
@@ -233,6 +235,16 @@ object ConnectThree extends App:
       printBoards(Seq(board))
       println("END TURN")
   play()
+
+
+//  def readInput(board: Board): (Int, Int) =
+//    (for
+//      in <- scala.io.StdIn.readLine()
+//      x = if in.toString.toIntOption.isDefined then in.toInt - 1 else readInput(board)._1
+//      y = firstAvailableRow(board, x)
+//      if !y.isDefined then readInput(board)
+//    yield (x, y.get)).head
+
 
 //  .... .... .... .... ...O
 //
