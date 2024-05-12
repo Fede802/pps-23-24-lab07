@@ -1,19 +1,12 @@
-package ex4.model
+package ex4.connectThree.model
+
+import ex4.commons.GameCommons.Player
 
 import scala.util.Random
 
 object Model:
   val bound = 3
-
-  enum GameType:
-    case RANDOM, SMART, MULTIPLAYER
-
-  enum Player:
-    case X, O
-    def other: Player = this match
-      case X => O
-      case _ => X
-
+  
   case class Disk(x: Int, y: Int, player: Player)
   /**
    * Board:
@@ -27,9 +20,7 @@ object Model:
    */
   type Board = Seq[Disk]
   type Game = Seq[Board]
-
-  import Player.*
-
+  
   def find(board: Board, x: Int, y: Int): Option[Player] =
     val player = for
       disk <- board
@@ -113,7 +104,6 @@ object Model:
             if newEval > maxEval then
                 maxEval = newEval
                 bestMove = newBoard
-        printBoards(Seq(bestMove))
         (maxEval, bestMove)
       else
         var minEval = Int.MaxValue
@@ -125,7 +115,6 @@ object Model:
             if newEval < minEval then
                 minEval = newEval
                 bestMove = newBoard
-        printBoards(Seq(bestMove))
         (minEval, bestMove)
 
   def smartAI(board: Board, player: Player): Board =

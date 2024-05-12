@@ -1,6 +1,6 @@
-package ex4
+package ex4.connectThree
 
-import ex4.model.ConnectThree.*
+import ex4.connectThree.model.Model.{Disk, Player, find, firstAvailableRow}
 import org.scalatest.matchers.should.Matchers.*
 
 class ConnectThreeTest extends org.scalatest.funsuite.AnyFunSuite:

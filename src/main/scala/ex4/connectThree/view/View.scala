@@ -1,8 +1,10 @@
-package ex4.view
+package ex4.connectThree.view
 
-import ex4.controller.Controller
-import ex4.model.Model
-import ex4.model.Model.GameType
+
+
+import ex4.commons.GameCommons.GameType
+import ex4.connectThree.controller.Controller
+import ex4.connectThree.model.Model
 
 import scala.annotation.tailrec
 import scala.io.StdIn
@@ -37,7 +39,7 @@ object View:
 
   private def selectColumn(): Int =
     var col = -1
-    while(Controller.firstAvailableRow(col).isEmpty)
+    while(Controller.available(col).isEmpty)
       println(s"Insert column [0 to ${Model.bound}]")
       val in = StdIn.readLine()
       if in.toIntOption.isDefined then col = in.toInt
