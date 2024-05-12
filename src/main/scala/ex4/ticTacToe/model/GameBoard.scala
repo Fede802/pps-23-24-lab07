@@ -20,20 +20,12 @@ object GameBoard:
   def apply(): GameBoard = new GameBoardImpl()
 
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
-    val columns = Random.shuffle(0 to bound).toList
-    val rows = Random.shuffle(0 to bound).toList
-    val moves =
-      for
-        x <- columns
-        y <- rows
-        if gameBoard.available(Position(x, y))
-      yield GameCell(Position(x, y), player)
-    moves.headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
+    generateMoves(gameBoard, player).headOption.getOrElse(gameBoard)
 
   def generateMoves(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
     for
-      x <- 0 to bound
-      y <- 0 to bound
+      x <- Random.shuffle(0 to bound).toList
+      y <- Random.shuffle(0 to bound).toList
       if gameBoard.available(Position(x, y))
     yield gameBoard :+ GameCell(Position(x, y), player)
 
