@@ -65,7 +65,7 @@ object GameBoard:
         (minEval, bestMove)
 
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
-    val (_, newBoard) = minimax(gameBoard, true, player, 4)
+    val (_, newBoard) = minimax(gameBoard, true, player, 10)
     newBoard
 
   private class GameBoardImpl(private val board: Board = Seq[Cell]()) extends GameBoard:

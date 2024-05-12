@@ -7,7 +7,7 @@ import ex4.ticTacToe.model.GameBoard
 
 trait Controller:
   def setupGame(gameType: GameType): Unit
-  def updateGame(x: Int, y: Int): Boolean
+  def updateGame(x: Int, y: Int): Unit
   def available(x: Int, y: Int): Boolean
   def currentPlayer: Player
   def playerIn(x: Int, y: Int): Option[Player]
@@ -29,12 +29,10 @@ object Controller:
           case GameType.SMART => {println("Smart game"); autoUpdate = () => GameBoard.smartAI(board, _currentPlayer.other)}
           case GameType.MULTIPLAYER => {println("Multiplayer game"); autoUpdate = switchPlayer}
 
-    override def updateGame(x: Int, y:Int): Boolean =
-      val available = board.available(x, y)
-      if available then
-        board.add(x, y, _currentPlayer)
-        board = autoUpdate()
-      available
+    override def updateGame(x: Int, y:Int): Unit =
+      board = board.add(x, y, _currentPlayer)
+      board = autoUpdate()
+
     override def available(x: Int, y: Int): Boolean = board.available(x, y)
     override def currentPlayer: Player = _currentPlayer
 

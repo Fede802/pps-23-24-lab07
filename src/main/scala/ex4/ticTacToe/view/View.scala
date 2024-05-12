@@ -43,11 +43,12 @@ object View:
   private def select(): (Int,Int) =
     var col = -1
     var row = -1
-    while (controller.available(row, col))
+    while(row == -1)
+      println(s"Insert row [0 to ${GameBoard.bound}]")
+      val in = StdIn.readLine()
+      if in.toIntOption.isDefined then row = in.toInt
+    while(col == -1)
       println(s"Insert column [0 to ${GameBoard.bound}]")
       val in = StdIn.readLine()
       if in.toIntOption.isDefined then col = in.toInt
-      println(s"Insert row [0 to ${GameBoard.bound}]")
-      val in2 = StdIn.readLine()
-      if in2.toIntOption.isDefined then row = in2.toInt
     (row, col)
