@@ -1,27 +1,27 @@
 package ex4.connectThree.controller
 
 import ex4.connectThree.model.Model
-import Model.{Board, Disk, firstAvailableRow, printBoards, randomAI, smartAI, won}
-import ex4.commons.GameCommons.{GameType, Player}
+import Model.{Board, firstAvailableRow, randomAI, smartAI, won}
+import ex4.commons.GameCommons.{GameCell, GameType, Player, Position}
 
 
 object Controller:
 
   private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
-  private var board: Board = Seq[Disk]()
+  private var board: Board = Seq[GameCell]()
   private var autoUpdate = switchPlayer
   private var _currentPlayer = Player.X
 
   def setupGame(gameType: GameType): Unit =
     board = Seq()
     gameType match
-      case GameType.RANDOM => {println("Random game"); autoUpdate = () => randomAI(board, _currentPlayer.other)}
-      case GameType.SMART => {println("Smart game"); autoUpdate = () => smartAI(board, _currentPlayer.other)}
-      case GameType.MULTIPLAYER => {println("Multiplayer game"); autoUpdate = switchPlayer}
+      case GameType.RANDOM => autoUpdate = () => randomAI(board, _currentPlayer.other)
+      case GameType.SMART => autoUpdate = () => smartAI(board, _currentPlayer.other)
+      case GameType.MULTIPLAYER => autoUpdate = switchPlayer
 
   def updateGame(column: Int): Unit = {
     val row = Model.firstAvailableRow(board, column).get
-    board = board :+ Disk(column, row, _currentPlayer)
+    board = board :+ GameCell(Position(column, row), _currentPlayer)
     board = autoUpdate()
   }
 
@@ -34,4 +34,3 @@ object Controller:
   def won(): Boolean = Model.won(board)
 
   def boardInfo: String = Model.boardInfo(Seq(board))
-

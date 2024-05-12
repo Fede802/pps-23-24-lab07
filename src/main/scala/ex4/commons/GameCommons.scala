@@ -1,19 +1,20 @@
 package ex4.commons
 
-object GameCommons {
+object GameCommons:
   
-  case class Cell(x: Int, y: Int, player: Player)
+  case class Position(x: Int, y: Int)
   
-  type Board = Seq[Cell]
+  case class GameCell(position: Position, player: Player)
+  
+  type Board = Seq[GameCell]
   
   enum GameType:
     case RANDOM, SMART, MULTIPLAYER
 
   enum Player:
     case X, O
-
     def other: Player = this match
       case X => O
       case _ => X
 
-}
+

@@ -1,13 +1,13 @@
 package ex4.connectThree.model
 
-import ex4.commons.GameCommons.Player
+import ex4.commons.GameCommons.{GameCell, Player, Position}
 
 import scala.util.Random
 
 object Model:
+
   val bound = 3
   
-  case class Disk(x: Int, y: Int, player: Player)
   /**
    * Board:
    * y
@@ -18,13 +18,15 @@ object Model:
    * 0
    *   0 1 2 3 <-- x
    */
-  type Board = Seq[Disk]
+
+  type Board = Seq[GameCell]
+
   type Game = Seq[Board]
   
   def find(board: Board, x: Int, y: Int): Option[Player] =
     val player = for
       disk <- board
-      if disk.x == x && disk.y == y
+      if disk.position.x == x && disk.position.y == y
     yield disk.player
     player.headOption
 
@@ -34,7 +36,7 @@ object Model:
       then freeY =
         (for
           y <- 0 to bound
-          if !board.exists(disk => disk.x == x && disk.y == y)
+          if find(board, x, y).isEmpty
         yield y).headOption
     freeY
 
@@ -43,7 +45,7 @@ object Model:
       x <- 0 to bound
       y = firstAvailableRow(board, x)
       if y.isDefined
-    yield board :+ Disk(x, y.get, player)
+    yield board :+ GameCell(Position(x, y.get), player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
      case 0 => LazyList(List())
@@ -79,7 +81,7 @@ object Model:
         x <- columns
         y = firstAvailableRow(board, x)
         if y.isDefined
-      yield Disk(x, y.get, player)
+      yield GameCell(Position(x, y.get), player)
     moves.headOption.map(m => board :+ m).getOrElse(board)
 
   def generateMoves(board: Board, player: Player): Seq[Board] =
@@ -87,7 +89,7 @@ object Model:
       x <- 0 to bound
       y = firstAvailableRow(board, x)
       if y.isDefined
-    yield board :+ Disk(x, y.get, player)
+    yield board :+ GameCell(Position(x, y.get), player)
 
   private def evaluate(board: Board, player: Player, evalFunction: Board => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, Board) =
     var bestMove = board
