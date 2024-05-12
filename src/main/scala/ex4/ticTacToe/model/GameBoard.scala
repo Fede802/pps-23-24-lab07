@@ -3,14 +3,14 @@ package ex4.ticTacToe.model
 import ex4.commons.GameCommons
 import ex4.commons.GameCommons.{Board, GameCell, Player, Position}
 
+import scala.annotation.targetName
 import scala.util.Random
 
-
-
 trait GameBoard:
+  @targetName("Add")
   def :+(gameCell: GameCell): GameBoard
-  def find(x: Int, y: Int): Option[Player]
-  def available(x: Int, y: Int): Boolean
+  def find(position: Position): Option[Player]
+  def available(position: Position): Boolean
   def won: Boolean
 
 object GameBoard:
@@ -26,7 +26,7 @@ object GameBoard:
       for
         x <- columns
         y <- rows
-        if gameBoard.available(x, y)
+        if gameBoard.available(Position(x, y))
       yield GameCell(Position(x, y), player)
     moves.headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
 
@@ -34,7 +34,7 @@ object GameBoard:
     for
       x <- 0 to bound
       y <- 0 to bound
-      if gameBoard.available(x, y)
+      if gameBoard.available(Position(x, y))
     yield gameBoard :+ GameCell(Position(x, y), player)
 
   private def evaluate(gameBoard: GameBoard, player: Player, evalFunction: GameBoard => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, GameBoard) =
@@ -62,33 +62,34 @@ object GameBoard:
 
   private class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
 
+    @targetName("Add")
     override def :+(gameCell: GameCell): GameBoard =
       new GameBoardImpl(board :+ gameCell)
 
-    override def find(x: Int, y: Int): Option[Player] =
+    override def find(position: Position): Option[Player] =
       val player = for
         move <- board
-        if move.position.x == x && move.position.y == y
+        if move.position == position
       yield move.player
       player.headOption
 
-    override def available(x: Int, y: Int): Boolean = find(x, y).isEmpty
+    override def available(position: Position): Boolean = find(position: Position).isEmpty
 
     override def won: Boolean =
       val r = for
         x <- 0 to bound
         y <- 0 to bound
-        player = find(x, y)
+        player = find(Position(x, y))
         if player.isDefined
         if existWinningCombination(x, y, player.get)
       yield true
       r.contains(true)
 
     private def existWinningCombination(x: Int, y: Int, player: Player): Boolean =
-      find(x-1,y).contains(player) && find(x+1,y).contains(player)
-      || find(x,y-1).contains(player) && find(x,y+1).contains(player)
-      || find(x-1,y-1).contains(player) && find(x+1,y+1).contains(player)
-      || find(x-1,y+1).contains(player) && find(x+1,y-1).contains(player)
+      find(Position(x-1,y)).contains(player) && find(Position(x+1,y)).contains(player)
+      || find(Position(x,y-1)).contains(player) && find(Position(x,y+1)).contains(player)
+      || find(Position(x-1,y-1)).contains(player) && find(Position(x+1,y+1)).contains(player)
+      || find(Position(x-1,y+1)).contains(player) && find(Position(x+1,y-1)).contains(player)
 
     override def toString: String =
       var info = ""
@@ -96,6 +97,6 @@ object GameBoard:
         y <- bound to 0 by -1
         x <- 0 to bound
       do
-        info += find(x,y).map(_.toString).getOrElse(" ")
+        info += find(Position(x,y)).map(_.toString).getOrElse(" ")
         if x == bound then info += "\n"
       info

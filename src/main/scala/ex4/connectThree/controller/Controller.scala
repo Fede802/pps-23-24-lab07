@@ -4,7 +4,6 @@ import ex4.connectThree.model.Model
 import Model.{Board, firstAvailableRow, randomAI, smartAI, won}
 import ex4.commons.GameCommons.{GameCell, GameType, Player, Position}
 
-
 object Controller:
 
   private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
@@ -27,10 +26,8 @@ object Controller:
 
   def available(column: Int): Option[Int] = Model.firstAvailableRow(board, column)
 
-  def currentPlayer(): Player = _currentPlayer
+  def currentPlayer: Player = _currentPlayer
 
-  def find(x: Int, y: Int): Option[Player] = Model.find(board,x, y)
-
-  def won(): Boolean = Model.won(board)
+  def won: Boolean = Model.won(board)
 
   def boardInfo: String = Model.boardInfo(Seq(board))

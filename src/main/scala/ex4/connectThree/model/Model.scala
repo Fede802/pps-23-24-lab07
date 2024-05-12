@@ -1,7 +1,6 @@
 package ex4.connectThree.model
 
 import ex4.commons.GameCommons.{GameCell, Player, Position}
-
 import scala.util.Random
 
 object Model:

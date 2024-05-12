@@ -1,11 +1,8 @@
 package ex4.connectThree.view
 
-
-
 import ex4.commons.GameCommons.GameType
 import ex4.connectThree.controller.Controller
 import ex4.connectThree.model.Model
-
 import scala.annotation.tailrec
 import scala.io.StdIn
 
@@ -30,8 +27,8 @@ object View:
       case _ => {println("Wrong Input, retry"); waitUserMenuSelection()}
 
   private def playGame(): Unit =
-    while(!Controller.won())
-      println(s"Player ${Controller.currentPlayer()} turn")
+    while(!Controller.won)
+      println(s"Player ${Controller.currentPlayer} turn")
       println(Controller.boardInfo)
       Controller.updateGame(selectColumn())
     println(s"Game Ended")
