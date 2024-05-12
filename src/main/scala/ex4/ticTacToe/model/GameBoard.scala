@@ -20,19 +20,19 @@ object GameBoard:
   def apply(): GameBoard = new GameBoardImpl()
 
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
-    generateMoves(gameBoard, player).headOption.getOrElse(gameBoard)
-
-  def generateMoves(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
+    generateMoves(gameBoard, player, Random.shuffle(0 to bound).toList).headOption.getOrElse(gameBoard)
+  
+  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int]): Seq[GameBoard] =
     for
-      x <- Random.shuffle(0 to bound).toList
-      y <- Random.shuffle(0 to bound).toList
+      x <- generator
+      y <- generator
       if gameBoard.available(Position(x, y))
     yield gameBoard :+ GameCell(Position(x, y), player)
 
   private def evaluate(gameBoard: GameBoard, player: Player, evalFunction: GameBoard => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, GameBoard) =
     var bestMove = gameBoard
     var bestEval = startEval
-    for newBoard <- generateMoves(gameBoard, player) do
+    for newBoard <- generateMoves(gameBoard, player, 0 to bound) do
       val eval = evalFunction(newBoard)
       if compare(eval, bestEval) then {bestEval = eval; bestMove = newBoard}
     (bestEval, bestMove)
