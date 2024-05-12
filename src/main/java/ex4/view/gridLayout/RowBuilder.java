@@ -2,6 +2,8 @@ package ex4.view.gridLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
+
 
 public class RowBuilder {
 
@@ -9,9 +11,15 @@ public class RowBuilder {
     private final JPanel panel = new JPanel();
 
     public RowBuilder(Constraint gridBagConstraints) {
+
         this.gridBagConstraints = gridBagConstraints.getConstraintSetup();
         this.panel.setLayout(new GridBagLayout());
         this.panel.setOpaque(false);
+    }
+
+    public RowBuilder add(Collection<JComponent> component) {
+        component.forEach(this::add);
+        return this;
     }
 
     public RowBuilder add(JComponent component) {

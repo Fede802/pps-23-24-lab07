@@ -2,6 +2,7 @@ package ex4.view.gridLayout;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collection;
 
 public class ColumnBuilder {
 
@@ -21,6 +22,11 @@ public class ColumnBuilder {
         this.gridBagConstraints.weightx = constraint.getNextWeightX();
         this.gridBagConstraints.weighty = constraint.getNextWeightY();
         this.panel.add(component, gridBagConstraints);
+        return this;
+    }
+
+    public ColumnBuilder add(Collection<JComponent> component) {
+        component.forEach(this::add);
         return this;
     }
 

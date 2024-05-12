@@ -4,9 +4,10 @@ import ex4.view.gridLayout.AbstractConstraint;
 
 import java.awt.*;
 
-public class BoardConstraint extends AbstractConstraint {
+public class GameCostraint extends AbstractConstraint {
 
 
+    private double weightY = 0.2;
 
     @Override
     protected GridBagConstraints createConstraints() {
@@ -17,5 +18,11 @@ public class BoardConstraint extends AbstractConstraint {
         return gridBagConstraints;
     }
 
+    @Override
+    public double getNextWeightY() {
+        double weightY = this.weightY;
+        this.weightY = 1.0;
+        return weightY;
+    }
 
 }

@@ -1,17 +1,20 @@
 package ex4.view.menu;
 
 import ex4.view.gridLayout.ColumnBuilder;
-
+import ex4.controller.Controller;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+
 public class MenuImpl extends JPanel {
 
     private final MenuListener menuListener;
+    private final Controller controller;
 
-    public MenuImpl(MenuListener menuListener) {
+    public MenuImpl(MenuListener menuListener, Controller controller) {
         this.menuListener = menuListener;
+        this.controller = controller;
         this.setLayout(new GridBagLayout());
         JButton randomAI = new MenuButton("Play With RandomAI", menuListener);
         randomAI.addActionListener(this.setupGame(GameType.RANDOM));
@@ -21,7 +24,6 @@ public class MenuImpl extends JPanel {
         multiplayer.addActionListener(this.setupGame(GameType.MULTIPLAYER));
         JButton quit = new MenuButton("Quit");
         quit.addActionListener(e -> System.exit(0));
-
 
         this.add(new ColumnBuilder(new MenuConstraint())
                 .add(randomAI)
@@ -34,7 +36,7 @@ public class MenuImpl extends JPanel {
 
     private ActionListener setupGame(GameType gameType) {
         return e -> {
-            //todo
+            this.controller.setupGame(gameType);
         };
     }
 

@@ -1,15 +1,15 @@
-package ex4
-
+package ex4.model
+//
 import scala.util.Random
-
-// Optional!
+//
+//// Optional!
 object ConnectThree extends App:
   val bound = 3
-  enum Player:
-    case X, O
-    def other: Player = this match
-      case X => O
-      case _ => X
+//  enum Player:
+//    case X, O
+//    def other: Player = this match
+//      case X => O
+//      case _ => X
 
   case class Disk(x: Int, y: Int, player: Player)
   /**
@@ -52,7 +52,7 @@ object ConnectThree extends App:
      case 0 => LazyList(List())
      case _ =>
         for
-          game <- computeAnyGame(player.other, moves - 1)
+          game <- computeAnyGame(player.other(), moves - 1)
           lastBoard = game.headOption.getOrElse(List())
           if !won(lastBoard)
           newBoard <- placeAnyDisk(lastBoard, player)
@@ -92,7 +92,7 @@ object ConnectThree extends App:
       if y.isDefined
     yield board :+ Disk(x, y.get, player)
 
-  def minimax(board: Board, maxPlayer: Boolean, depth: Int): (Int, Board) = (board, depth) match
+  def minimax(board: Board, maxPlayer: Boolean, player: Player, depth: Int): (Int, Board) = (board, depth) match
     case (board, _) if won(board) => if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, board)
     case _ =>
@@ -101,10 +101,10 @@ object ConnectThree extends App:
         var maxEval = Int.MinValue
 //        println(s"depth: ${depth} MAX startEval")
         for
-          newBoard <- generateMoves(board, X)
+          newBoard <- generateMoves(board, player)
         do
           printBoards(Seq(newBoard))
-          val eval = minimax(newBoard, false, depth - 1)
+          val eval = minimax(newBoard, false, player.other, depth - 1)
 //          println(s"returned ${eval._1}")
           val newEval = Math.max(maxEval, eval._1)
             if newEval > maxEval then
@@ -119,10 +119,10 @@ object ConnectThree extends App:
         var minEval = Int.MaxValue
 //        println(s"depth: ${depth} MIN startEval")
         for
-          newBoard <- generateMoves(board, O)
+          newBoard <- generateMoves(board, player)
         do
           printBoards(Seq(newBoard))
-          val eval = minimax(newBoard, true, depth - 1)
+          val eval = minimax(newBoard, true, player.other, depth - 1)
           val newEval = Math.min(minEval, eval._1)
             if newEval < minEval then
                 minEval = newEval
@@ -132,8 +132,8 @@ object ConnectThree extends App:
 //        println(s"depth: ${depth} MIN endEval")
         (minEval, bestMove)
 
-  def smartAI(board: Board, maxPlayer: Boolean): Board =
-    val (_, newBoard) = minimax(board, maxPlayer, 4)
+  def smartAI(board: Board, player: Player): Board =
+    val (_, newBoard) = minimax(board, true, player, 4)
     newBoard
 
   def printBoards(game: Seq[Board]): Unit =
@@ -195,46 +195,8 @@ object ConnectThree extends App:
 //  .... ...X ...X ...X ...X
 //
   printBoards(List(Seq(Disk(0, 0, X), Disk(0, 1, O), Disk(0, 2, X), Disk(1, 0, O), Disk(1, 1, O)))) // None
-  import IOs.*
-
-  def autoplay(): Unit =
-    var board: Board = Seq()
-    var turn = true
-    while (!won(board))
-      println("START TURN")
-      if turn
-      then {printBoards(Seq(board)); board = smartAI(board, true)}
-      else {printBoards(Seq(board)); board = smartAI(board, false)}
-      turn = !turn
-      printBoards(Seq(board))
-      println("END TURN")
-  autoplay()
 
 
-  def play(): Unit =
-    var board: Board = Seq()
-    var turn = true
-    while (!won(board))
-      println("START TURN")
-      if turn
-        then {printBoards(Seq(board));board = smartAI(board, true)}
-        else
-          printBoards(Seq(board))
-          var validMove = false
-          var x = -1
-          var y = -1
-          while (!validMove)
-            println("Enter x:")
-            x = scala.io.StdIn.readLine().toInt - 1
-            val opy = firstAvailableRow(board, x)
-            if opy.isDefined
-              then {validMove = true; y = opy.get}
-              else println("Invalid move")
-          board = board :+ Disk(x, y, O)
-      turn = !turn
-      printBoards(Seq(board))
-      println("END TURN")
-  play()
 
 
 //  def readInput(board: Board): (Int, Int) =
@@ -246,6 +208,6 @@ object ConnectThree extends App:
 //    yield (x, y.get)).head
 
 
-//  .... .... .... .... ...O
-//
-//// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
+////  .... .... .... .... ...O
+////
+////// Exercise 4 (VERY ADVANCED!) -- modify the above one so as to stop each game when someone won!!
