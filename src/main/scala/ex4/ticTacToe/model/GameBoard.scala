@@ -60,7 +60,7 @@ object GameBoard:
       else evaluationSetup(Int.MaxValue, _ < _)
 
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
-    minimax(gameBoard, true, player, 10)._2
+    minimax(gameBoard, true, player, 4)._2
 
   private case class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
 
