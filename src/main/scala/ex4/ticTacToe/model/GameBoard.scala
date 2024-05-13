@@ -57,14 +57,13 @@ object GameBoard:
         evaluationSetup(Int.MaxValue, _ < _)
 
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
-    val (_, newBoard) = minimax(gameBoard, true, player, 10)
-    newBoard
+    minimax(gameBoard, true, player, 10)._2
 
-  private class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
+  private case class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
 
     @targetName("Add")
     override def :+(gameCell: GameCell): GameBoard =
-      new GameBoardImpl(board :+ gameCell)
+      GameBoardImpl(board :+ gameCell)
 
     override def find(position: Position): Option[Player] =
       val player = for
