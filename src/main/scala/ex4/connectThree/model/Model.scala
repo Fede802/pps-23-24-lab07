@@ -111,8 +111,7 @@ object Model:
 
   def smartAI(board: Board, player: Player): Board =
     minimax(board, true, player, 4)._2
-
-
+  
   def printBoards(game: Seq[Board]): Unit =
     println(boardInfo(game))
 
