@@ -20,9 +20,10 @@ object GameBoard:
   def apply(): GameBoard = new GameBoardImpl()
 
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
-    generateMoves(gameBoard, player, Random.shuffle(0 to bound).toList).headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
+    generateMoves(gameBoard, player, Random.shuffle(0 to bound))
+      .headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
 
-  def generatePositions(gameBoard: GameBoard, generator: Seq[Int]): Seq[Position] =
+  def generatePositions(generator: Seq[Int]): Seq[Position] =
     for
       x <- generator
       y <- generator
@@ -30,7 +31,7 @@ object GameBoard:
 
   def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int]): Seq[GameCell] =
     for
-      position <- generatePositions(gameBoard, generator)
+      position <- generatePositions(generator)
       if gameBoard.available(position)
     yield GameCell(position, player)
 
@@ -76,7 +77,7 @@ object GameBoard:
 
     override def won: Boolean =
       val r = for
-        position <- generatePositions(this, 0 to bound)
+        position <- generatePositions(0 to bound)
         player = find(position)
         if player.isDefined
         if existWinningCombination(position.x, position.y, player.get)

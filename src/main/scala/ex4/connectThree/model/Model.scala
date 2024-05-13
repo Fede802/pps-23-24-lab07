@@ -41,10 +41,8 @@ object Model:
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] =
     for
-      x <- 0 to bound
-      y = firstAvailableRow(board, x)
-      if y.isDefined
-    yield board :+ GameCell(Position(x, y.get), player)
+      position <- generatePositions(board, 0 to bound)
+    yield board :+ GameCell(position, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
      case 0 => LazyList(List())
@@ -74,26 +72,28 @@ object Model:
 
   Random.setSeed(1234)
   def randomAI(board: Board, player: Player): Board =
-    val columns = Random.shuffle(0 to bound).toList
-    val moves =
-      for
-        x <- columns
-        y = firstAvailableRow(board, x)
-        if y.isDefined
-      yield GameCell(Position(x, y.get), player)
-    moves.headOption.map(m => board :+ m).getOrElse(board)
+    generateMoves(board, player, Random.shuffle(0 to bound))
+      .headOption.map(m => board :+ m).getOrElse(board)
 
-  def generateMoves(board: Board, player: Player): Seq[Board] =
+  def generatePositions(board: Board, generator: Seq[Int]): Seq[Position] =
     for
-      x <- 0 to bound
+      x <- generator
       y = firstAvailableRow(board, x)
       if y.isDefined
-    yield board :+ GameCell(Position(x, y.get), player)
+    yield Position(x, y.get)
+
+  def generateMoves(board: Board, player: Player, generator: Seq[Int]): Seq[GameCell] =
+    for
+      position <- generatePositions(board, generator)
+    yield GameCell(position, player)
 
   private def evaluate(board: Board, player: Player, evalFunction: Board => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, Board) =
     var bestMove = board
     var bestEval = startEval
-    for newBoard <- generateMoves(board, player) do
+    for
+      move <- generateMoves(board, player, 0 to bound)
+      newBoard = board :+ move
+    do
       val eval = evalFunction(newBoard)
       if compare(eval, bestEval) then {bestEval = eval; bestMove = newBoard}
     (bestEval, bestMove)
@@ -110,8 +110,8 @@ object Model:
         evaluationSetup(Int.MaxValue, _ < _)
 
   def smartAI(board: Board, player: Player): Board =
-    val (_, newBoard) = minimax(board, true, player, 4)
-    newBoard
+    minimax(board, true, player, 4)._2
+
 
   def printBoards(game: Seq[Board]): Unit =
     println(boardInfo(game))
