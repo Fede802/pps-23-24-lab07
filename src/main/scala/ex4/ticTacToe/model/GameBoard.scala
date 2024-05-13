@@ -23,13 +23,13 @@ object GameBoard:
     generateMoves(gameBoard, player, Random.shuffle(0 to bound))
       .headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
 
-  def generatePositions(generator: Seq[Int]): Seq[Position] =
+  def generatePositions(generator: Seq[Int] = 0 to bound): Seq[Position] =
     for
       x <- generator
       y <- generator
     yield Position(x, y)
 
-  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int]): Seq[GameCell] =
+  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
     for
       position <- generatePositions(generator)
       if gameBoard.available(position)
@@ -39,7 +39,7 @@ object GameBoard:
     var bestMove = gameBoard
     var bestEval = startEval
     for
-      newMove <- generateMoves(gameBoard, player, 0 to bound)
+      newMove <- generateMoves(gameBoard, player)
       newBoard = gameBoard :+ newMove
     do
       val eval = evalFunction(newBoard)
@@ -77,7 +77,7 @@ object GameBoard:
 
     override def won: Boolean =
       val r = for
-        position <- generatePositions(0 to bound)
+        position <- generatePositions()
         player = find(position)
         if player.isDefined
         if existWinningCombination(position.x, position.y, player.get)

@@ -41,7 +41,7 @@ object Model:
 
   def placeAnyDisk(board: Board, player: Player): Seq[Board] =
     for
-      position <- generatePositions(board, 0 to bound)
+      position <- generatePositions(board)
     yield board :+ GameCell(position, player)
 
   def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
@@ -75,14 +75,14 @@ object Model:
     generateMoves(board, player, Random.shuffle(0 to bound))
       .headOption.map(m => board :+ m).getOrElse(board)
 
-  def generatePositions(board: Board, generator: Seq[Int]): Seq[Position] =
+  def generatePositions(board: Board, generator: Seq[Int] = 0 to bound): Seq[Position] =
     for
       x <- generator
       y = firstAvailableRow(board, x)
       if y.isDefined
     yield Position(x, y.get)
 
-  def generateMoves(board: Board, player: Player, generator: Seq[Int]): Seq[GameCell] =
+  def generateMoves(board: Board, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
     for
       position <- generatePositions(board, generator)
     yield GameCell(position, player)
@@ -91,7 +91,7 @@ object Model:
     var bestMove = board
     var bestEval = startEval
     for
-      move <- generateMoves(board, player, 0 to bound)
+      move <- generateMoves(board, player)
       newBoard = board :+ move
     do
       val eval = evalFunction(newBoard)
