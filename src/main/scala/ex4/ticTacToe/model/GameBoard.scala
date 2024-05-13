@@ -20,19 +20,27 @@ object GameBoard:
   def apply(): GameBoard = new GameBoardImpl()
 
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
-    generateMoves(gameBoard, player, Random.shuffle(0 to bound).toList).headOption.getOrElse(gameBoard)
-  
-  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int]): Seq[GameBoard] =
+    generateMoves(gameBoard, player, Random.shuffle(0 to bound).toList).headOption.map(gc => gameBoard :+ gc).getOrElse(gameBoard)
+
+  def generatePositions(gameBoard: GameBoard, generator: Seq[Int]): Seq[Position] =
     for
       x <- generator
       y <- generator
-      if gameBoard.available(Position(x, y))
-    yield gameBoard :+ GameCell(Position(x, y), player)
+    yield Position(x, y)
+
+  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int]): Seq[GameCell] =
+    for
+      position <- generatePositions(gameBoard, generator)
+      if gameBoard.available(position)
+    yield GameCell(position, player)
 
   private def evaluate(gameBoard: GameBoard, player: Player, evalFunction: GameBoard => Int)(startEval: Int,compare: (Int, Int) => Boolean): (Int, GameBoard) =
     var bestMove = gameBoard
     var bestEval = startEval
-    for newBoard <- generateMoves(gameBoard, player, 0 to bound) do
+    for
+      newMove <- generateMoves(gameBoard, player, 0 to bound)
+      newBoard = gameBoard :+ newMove
+    do
       val eval = evalFunction(newBoard)
       if compare(eval, bestEval) then {bestEval = eval; bestMove = newBoard}
     (bestEval, bestMove)
@@ -69,11 +77,10 @@ object GameBoard:
 
     override def won: Boolean =
       val r = for
-        x <- 0 to bound
-        y <- 0 to bound
-        player = find(Position(x, y))
+        position <- generatePositions(this, 0 to bound)
+        player = find(position)
         if player.isDefined
-        if existWinningCombination(x, y, player.get)
+        if existWinningCombination(position.x, position.y, player.get)
       yield true
       r.contains(true)
 
