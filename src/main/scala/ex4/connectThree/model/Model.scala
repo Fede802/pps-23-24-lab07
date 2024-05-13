@@ -71,6 +71,7 @@ object Model:
     || find(board, x - 1, y + 1).contains(player) && find(board, x - 2, y + 2).contains(player)
 
   Random.setSeed(1234)
+
   def randomAI(board: Board, player: Player): Board =
     generateMoves(board, player, Random.shuffle(0 to bound))
       .headOption.map(m => board :+ m).getOrElse(board)
@@ -111,7 +112,7 @@ object Model:
 
   def smartAI(board: Board, player: Player): Board =
     minimax(board, true, player, 4)._2
-  
+
   def printBoards(game: Seq[Board]): Unit =
     println(boardInfo(game))
 

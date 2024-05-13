@@ -14,9 +14,9 @@ trait Controller:
 
 object Controller:
 
-  def apply(): Controller = new ControllerImpl()
+  def apply(): Controller = ControllerImpl()
 
-  private class ControllerImpl extends Controller:
+  private case class ControllerImpl() extends Controller:
 
     private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
     private var board = GameBoard()
