@@ -11,6 +11,11 @@ class ModelTest extends org.scalatest.funsuite.AnyFunSuite:
   private val player = Player.X
   private val rowSize = (0 to bound).size
 
+  private def fillRow(y: Int, p: Player): Board =
+    for
+      x <- 0 to bound
+    yield GameCell(Position(x, y), p)
+
   test("find player given a position"):
     find(List(GameCell(Position(0, 0), Player.X)), 0, 0) shouldBe Some(Player.X)
     find(List(GameCell(Position(0, 0), Player.X), GameCell(Position(0, 1), Player.O), GameCell(Position(0, 2), Player.X)), 0, 1) shouldBe Some(Player.O)
@@ -44,12 +49,6 @@ class ModelTest extends org.scalatest.funsuite.AnyFunSuite:
     computeAnyGame(player, 0) should have size 1 //empty board
     computeAnyGame(player, 1) should have size rowSize
     computeAnyGame(player, 4).distinct should have size pow(rowSize, 4).toInt
-
-
-  def fillRow(y: Int, p: Player): Board =
-    for
-      x <- 0 to bound
-    yield GameCell(Position(x, y), p)
 
   test("4 or less moves is not enough to win the game"):
     for

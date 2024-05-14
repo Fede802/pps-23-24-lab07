@@ -7,7 +7,7 @@ import ex4.commons.GameCommons.{Board, GameCell, GameType, Player, Position}
 object Controller:
 
   private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
-  private var board: Board = Seq[GameCell]()
+  private[controller] var board: Board = Seq[GameCell]()
   private var autoUpdate = switchPlayer
   private var _currentPlayer = Player.X
 
@@ -18,11 +18,10 @@ object Controller:
       case GameType.SMART => autoUpdate = () => smartAI(board, _currentPlayer.other)
       case GameType.MULTIPLAYER => autoUpdate = switchPlayer
 
-  def updateGame(column: Int): Unit = {
+  def updateGame(column: Int): Unit =
     val row = Model.firstAvailableRow(board, column).get
     board = board :+ GameCell(Position(column, row), _currentPlayer)
     board = autoUpdate()
-  }
 
   def available(column: Int): Option[Int] = Model.firstAvailableRow(board, column)
 
