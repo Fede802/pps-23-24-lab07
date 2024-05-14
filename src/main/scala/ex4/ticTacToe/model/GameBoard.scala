@@ -99,6 +99,11 @@ object GameBoard:
         y <- bound to 0 by -1
         x <- 0 to bound
       do
+        if x != 0 then info += " | "
         info += find(Position(x, y)).map(_.toString).getOrElse(" ")
-        if x == bound then info += "\n"
+        if x == bound then 
+          info += "\n"; 
+          if y != 0 then  
+            for i <- 0 to bound do info += "-- "
+            info += "\n"
       info

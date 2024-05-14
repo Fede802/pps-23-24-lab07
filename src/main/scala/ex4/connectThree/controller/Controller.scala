@@ -1,8 +1,8 @@
 package ex4.connectThree.controller
 
 import ex4.connectThree.model.Model
-import Model.{Board, firstAvailableRow, randomAI, smartAI, won}
-import ex4.commons.GameCommons.{GameCell, GameType, Player, Position}
+import Model.{firstAvailableRow, randomAI, smartAI, won}
+import ex4.commons.GameCommons.{Board, GameCell, GameType, Player, Position}
 
 object Controller:
 
