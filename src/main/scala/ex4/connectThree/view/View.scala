@@ -36,7 +36,7 @@ object View:
 
   private def selectColumn(): Int =
     var col = -1
-    while(Controller.available(col).isEmpty)
+    while(col == -1)
       println(s"Insert column [0 to ${Model.bound}]")
       val in = StdIn.readLine()
       if in.toIntOption.isDefined then col = in.toInt

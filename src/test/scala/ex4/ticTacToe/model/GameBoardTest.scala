@@ -39,14 +39,14 @@ class GameBoardTest extends org.scalatest.funsuite.AnyFunSuite:
     (gameBoard :+ GameCell(Position(0, 0), Player.X)).available(Position(0, 0)) shouldBe false
 
   test("makeAnyMove in empty board"):
-    GameBoard.doAllPossibleMove(gameBoard, player) should have size nCell
-    GameBoard.doAllPossibleMove(gameBoard, player).distinct should have size nCell
+    GameBoard.doAllPossibleMoves(gameBoard, player) should have size nCell
+    GameBoard.doAllPossibleMoves(gameBoard, player).distinct should have size nCell
 
   test("makeAnyMove in a non empty board"):
-    GameBoard.doAllPossibleMove(gameBoard :+ GameCell(Position(0, 0), player), player) should have size (nCell - 1)
+    GameBoard.doAllPossibleMoves(gameBoard :+ GameCell(Position(0, 0), player), player) should have size (nCell - 1)
 
   test("makeAnyMove in a full board"):
-    GameBoard.doAllPossibleMove(filledBoard, player) should have size 0
+    GameBoard.doAllPossibleMoves(filledBoard, player) should have size 0
 
   test("computeAnyGame given a player and number of moves"):
     GameBoard.computeAnyGame(player, 0) should have size 1 //empty board

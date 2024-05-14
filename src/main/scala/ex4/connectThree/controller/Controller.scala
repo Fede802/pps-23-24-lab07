@@ -18,12 +18,12 @@ object Controller:
       case GameType.SMART => autoUpdate = () => smartAI(board, _currentPlayer.other)
       case GameType.MULTIPLAYER => autoUpdate = switchPlayer
 
-  def updateGame(column: Int): Unit =
-    val row = Model.firstAvailableRow(board, column).get
-    board = board :+ GameCell(Position(column, row), _currentPlayer)
-    board = autoUpdate()
-
-  def available(column: Int): Option[Int] = Model.firstAvailableRow(board, column)
+  def updateGame(column: Int): Boolean =
+    val row = Model.firstAvailableRow(board, column)
+    if row.isDefined then
+      board = board :+ GameCell(Position(column, row.get), _currentPlayer)
+      board = autoUpdate()
+    row.isDefined
 
   def currentPlayer: Player = _currentPlayer
 

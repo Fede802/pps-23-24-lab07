@@ -32,17 +32,33 @@ object GameBoard:
       yield player
     playerPlaced.headOption
     
+  def doAllPossibleMoves(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
+    generateMoves(gameBoard, player).map(gameBoard :+ _)
+
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
+    case 0 => LazyList(Seq(GameBoard()))
+    case _ =>
+      for
+        game <- computeAnyGame(player.other, moves - 1)
+        lastBoard = game.headOption
+        if lastBoard.isDefined && !lastBoard.get.won
+        newBoard <- doAllPossibleMoves(lastBoard.get, player)
+      yield newBoard +: game
+      
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
     generateMoves(gameBoard, player, Random.shuffle(0 to bound)).headOption
       .map(gc => gameBoard :+ gc)
       .getOrElse(gameBoard)
 
-  def generatePositions(generator: Seq[Int] = 0 to bound): Seq[Position] =
+  def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
+    minimax(gameBoard, true, player, 4)._2
+    
+  private def generatePositions(generator: Seq[Int] = 0 to bound): Seq[Position] =
     for
       x <- generator
       y <- generator
     yield Position(x, y)
-
+    
   private def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
     for
       position <- generatePositions(generator)
@@ -70,23 +86,7 @@ object GameBoard:
       val evaluationSetup = evaluate(gameBoard, player, evalFunction)
       if maxPlayer then evaluationSetup(Int.MinValue, _ > _)
       else evaluationSetup(Int.MaxValue, _ < _)
-      
-  def doAllPossibleMove(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
-    generateMoves(gameBoard, player).map(gameBoard :+ _)
-    
-  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
-    case 0 => LazyList(Seq(GameBoard()))
-    case _ =>
-      for
-        game <- computeAnyGame(player.other, moves - 1)
-        lastBoard = game.headOption
-        if lastBoard.isDefined && !lastBoard.get.won
-        newBoard <- doAllPossibleMove(lastBoard.get, player)
-      yield newBoard +: game
-    
-  def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
-    minimax(gameBoard, true, player, 4)._2
-
+  
   private case class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
 
     @targetName("Add")
