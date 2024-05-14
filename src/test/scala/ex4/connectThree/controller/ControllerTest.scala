@@ -7,23 +7,23 @@ class ControllerTest extends org.scalatest.funsuite.AnyFunSuite:
 
   private val startPlayer = Controller.currentPlayer
 
-  test("playWithRandomAI"):
+  test("playWithRandomAI mode"):
     Controller.setupGame(GameType.RANDOM)
     Controller.updateGame(0)
     Controller.board should have size 2
     Controller.board.find(_.player == startPlayer) shouldBe defined
     Controller.board.find(_.player == startPlayer.other) shouldBe defined
 
-  test("playWithSmartAI"):
+  test("playWithSmartAI mode"):
     Controller.setupGame(GameType.SMART)
     Controller.updateGame(0)
     Controller.board should have size 2
     Controller.board.find(_.player == startPlayer) shouldBe defined
     Controller.board.find(_.player == startPlayer.other) shouldBe defined
 
-  test("multiplayer"):
+  test("multiplayer mode"):
     Controller.setupGame(GameType.MULTIPLAYER)
-    Controller.updateGame(0)
+    Controller.updateGame(0) 
     Controller.board should have size 1
     Controller.board.find(_.player == startPlayer) shouldBe defined
     Controller.updateGame(0)

@@ -8,8 +8,6 @@ object GameCommons:
   
   type Board = Seq[GameCell]
 
-  type Game = Seq[Board]
-  
   enum GameType:
     case RANDOM, SMART, MULTIPLAYER
 

@@ -1,11 +1,13 @@
 package ex4.connectThree.model
 
-import ex4.commons.GameCommons.{Board, Game, GameCell, Player, Position}
+import ex4.commons.GameCommons.{Board, GameCell, Player, Position}
 
 import scala.util.Random
 
 object Model:
 
+  type Game = Seq[Board]
+  
   val bound = 3
   
   /**

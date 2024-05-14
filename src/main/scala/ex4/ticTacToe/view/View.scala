@@ -12,7 +12,7 @@ trait View:
 
 object View:
 
-  def apply(controller: Controller): View = new ViewImpl(controller)
+  def apply(controller: Controller): View = ViewImpl(controller)
 
   private case class ViewImpl(private val controller: Controller) extends View:
 

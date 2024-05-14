@@ -48,6 +48,7 @@ class ModelTest extends org.scalatest.funsuite.AnyFunSuite:
     //TODO generalize
     computeAnyGame(player, 0) should have size 1 //empty board
     computeAnyGame(player, 1) should have size rowSize
+    computeAnyGame(player, 4) should have size pow(rowSize, 4).toInt
     computeAnyGame(player, 4).distinct should have size pow(rowSize, 4).toInt
 
   test("4 or less moves is not enough to win the game"):

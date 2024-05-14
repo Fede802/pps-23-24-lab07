@@ -9,6 +9,7 @@ import scala.util.Random
 trait GameBoard:
   @targetName("Add")
   def :+(gameCell: GameCell): GameBoard
+  def size: Int
   def find(position: Position): Option[Player]
   def available(position: Position): Boolean
   def won: Boolean
@@ -16,10 +17,21 @@ trait GameBoard:
 object GameBoard:
   Random.setSeed(1234)
 
+  type Game = Seq[GameBoard]
+  
   val bound = 2
 
   def apply(): GameBoard = GameBoardImpl()
 
+  def findPlayer(board: GameBoard, p: Player): Option[Player] =
+    val playerPlaced =
+      for
+        position <- GameBoard.generatePositions()
+        player <- board.find(position)
+        if player == p
+      yield player
+    playerPlaced.headOption
+    
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
     generateMoves(gameBoard, player, Random.shuffle(0 to bound)).headOption
       .map(gc => gameBoard :+ gc)
@@ -31,7 +43,7 @@ object GameBoard:
       y <- generator
     yield Position(x, y)
 
-  def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
+  private def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
     for
       position <- generatePositions(generator)
       if gameBoard.available(position)
@@ -48,7 +60,7 @@ object GameBoard:
       if compare(eval, bestEval) then { bestEval = eval; bestMove = newBoard }
     (bestEval, bestMove)
 
-  def minimax(gameBoard: GameBoard, maxPlayer: Boolean, player: Player, depth: Int): (Int, GameBoard) = (gameBoard, depth) match
+  private def minimax(gameBoard: GameBoard, maxPlayer: Boolean, player: Player, depth: Int): (Int, GameBoard) = (gameBoard, depth) match
     case (board, _) if board.won =>
       if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, gameBoard)
@@ -58,7 +70,20 @@ object GameBoard:
       val evaluationSetup = evaluate(gameBoard, player, evalFunction)
       if maxPlayer then evaluationSetup(Int.MinValue, _ > _)
       else evaluationSetup(Int.MaxValue, _ < _)
-
+      
+  def doAllPossibleMove(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
+    generateMoves(gameBoard, player).map(gameBoard :+ _)
+    
+  def computeAnyGame(player: Player, moves: Int): LazyList[Game] = moves match
+    case 0 => LazyList(Seq(GameBoard()))
+    case _ =>
+      for
+        game <- computeAnyGame(player.other, moves - 1)
+        lastBoard = game.headOption
+        if lastBoard.isDefined && !lastBoard.get.won
+        newBoard <- doAllPossibleMove(lastBoard.get, player)
+      yield newBoard +: game
+    
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
     minimax(gameBoard, true, player, 4)._2
 
@@ -68,6 +93,9 @@ object GameBoard:
     override def :+(gameCell: GameCell): GameBoard =
       GameBoardImpl(board :+ gameCell)
 
+    override def size: Int =
+      board.size
+    
     override def find(position: Position): Option[Player] =
       val player = for
         move <- board

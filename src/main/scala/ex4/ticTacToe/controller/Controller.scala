@@ -6,8 +6,9 @@ import ex4.connectThree.model.Model.*
 import ex4.ticTacToe.model.GameBoard
 
 trait Controller:
+  private[controller] var board: GameBoard
   def setupGame(gameType: GameType): Unit
-  def updateGame(position: Position): Unit
+  def updateGame(position: Position): Boolean
   def currentPlayer: Player
   def won: Boolean
   def gameInfo: String
@@ -19,7 +20,7 @@ object Controller:
   private case class ControllerImpl() extends Controller:
 
     private val switchPlayer = () => {_currentPlayer = _currentPlayer.other; board}
-    private var board = GameBoard()
+    private[controller] var board = GameBoard()
     private var autoUpdate = switchPlayer
     private var _currentPlayer = Player.X
 
@@ -30,10 +31,13 @@ object Controller:
           case GameType.SMART => autoUpdate = () => GameBoard.smartAI(board, _currentPlayer.other)
           case GameType.MULTIPLAYER => autoUpdate = switchPlayer
 
-    override def updateGame(position: Position): Unit =
-      board = board :+ GameCell(position, _currentPlayer)
-      board = autoUpdate()
-
+    override def updateGame(position: Position): Boolean =
+      val available = board.available(position)
+      if available then
+        board = board :+ GameCell(position, _currentPlayer)
+        board = autoUpdate()
+      available
+      
     override def currentPlayer: Player = _currentPlayer
 
     override def won: Boolean = board.won
