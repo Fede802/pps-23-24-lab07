@@ -7,9 +7,9 @@ import scala.util.Random
 object Model:
 
   type Game = Seq[Board]
-  
+
   val bound = 3
-  
+
   /**
    * Board:
    * y
@@ -62,15 +62,15 @@ object Model:
         if existWinningCombination(board, x, y, player.get)
     yield true
     r.contains(true)  //r.headOption.getOrElse(false)
-  
+
   Random.setSeed(1234)
 
   def randomAI(board: Board, player: Player): Board =
     generateMoves(board, player, Random.shuffle(0 to bound))
       .headOption.map(m => board :+ m).getOrElse(board)
-  
+
   def smartAI(board: Board, player: Player): Board =
-    minimax(board, true, player, 4)._2
+    minmax(board, true, player, 4)._2
 
   def printBoards(game: Seq[Board]): Unit =
     println(boardInfo(game))
@@ -113,11 +113,11 @@ object Model:
       }
     (bestEval, bestMove)
 
-  private def minimax(board: Board, maxPlayer: Boolean, player: Player, depth: Int): (Int, Board) = (board, depth) match
+  private def minmax(board: Board, maxPlayer: Boolean, player: Player, depth: Int): (Int, Board) = (board, depth) match
     case (board, _) if won(board) => if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, board)
     case _ =>
-      val evalFunction = (newBoard: Board) => minimax(newBoard, !maxPlayer, player.other, depth - 1)._1
+      val evalFunction = (newBoard: Board) => minmax(newBoard, !maxPlayer, player.other, depth - 1)._1
       val evaluationSetup = evaluate(board, player, evalFunction)
       if maxPlayer then
         evaluationSetup(Int.MinValue, _ > _)
@@ -128,4 +128,4 @@ object Model:
     find(board, x + 1, y).contains(player) && find(board, x + 2, y).contains(player)
       || find(board, x, y + 1).contains(player) && find(board, x, y + 2).contains(player)
       || find(board, x + 1, y + 1).contains(player) && find(board, x + 2, y + 2).contains(player)
-      || find(board, x - 1, y + 1).contains(player) && find(board, x - 2, y + 2).contains(player)      
+      || find(board, x - 1, y + 1).contains(player) && find(board, x - 2, y + 2).contains(player)

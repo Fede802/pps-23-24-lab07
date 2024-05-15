@@ -18,7 +18,7 @@ object GameBoard:
   Random.setSeed(1234)
 
   type Game = Seq[GameBoard]
-  
+
   val bound = 2
 
   def apply(): GameBoard = GameBoardImpl()
@@ -31,7 +31,7 @@ object GameBoard:
         if player == p
       yield player
     playerPlaced.headOption
-    
+
   def doAllPossibleMoves(gameBoard: GameBoard, player: Player): Seq[GameBoard] =
     generateMoves(gameBoard, player).map(gameBoard :+ _)
 
@@ -44,21 +44,21 @@ object GameBoard:
         if lastBoard.isDefined && !lastBoard.get.won
         newBoard <- doAllPossibleMoves(lastBoard.get, player)
       yield newBoard +: game
-      
+
   def randomAI(gameBoard: GameBoard, player: Player): GameBoard =
     generateMoves(gameBoard, player, Random.shuffle(0 to bound)).headOption
       .map(gc => gameBoard :+ gc)
       .getOrElse(gameBoard)
 
   def smartAI(gameBoard: GameBoard, player: Player): GameBoard =
-    minimax(gameBoard, true, player, 4)._2
-    
+    minmax(gameBoard, true, player, 4)._2
+
   private def generatePositions(generator: Seq[Int] = 0 to bound): Seq[Position] =
     for
       x <- generator
       y <- generator
     yield Position(x, y)
-    
+
   private def generateMoves(gameBoard: GameBoard, player: Player, generator: Seq[Int] = 0 to bound): Seq[GameCell] =
     for
       position <- generatePositions(generator)
@@ -76,17 +76,16 @@ object GameBoard:
       if compare(eval, bestEval) then { bestEval = eval; bestMove = newBoard }
     (bestEval, bestMove)
 
-  private def minimax(gameBoard: GameBoard, maxPlayer: Boolean, player: Player, depth: Int): (Int, GameBoard) = (gameBoard, depth) match
+  private def minmax(gameBoard: GameBoard, maxPlayer: Boolean, player: Player, depth: Int): (Int, GameBoard) = (gameBoard, depth) match
     case (board, _) if board.won =>
       if maxPlayer then (-1, board) else (1, board)
     case (_, 0) => (0, gameBoard)
     case _ =>
-      val evalFunction = (newBoard: GameBoard) =>
-        minimax(newBoard, !maxPlayer, player.other, depth - 1)._1
+      val evalFunction = (newBoard: GameBoard) => minmax(newBoard, !maxPlayer, player.other, depth - 1)._1
       val evaluationSetup = evaluate(gameBoard, player, evalFunction)
       if maxPlayer then evaluationSetup(Int.MinValue, _ > _)
       else evaluationSetup(Int.MaxValue, _ < _)
-  
+
   private case class GameBoardImpl(private val board: Board = Seq[GameCell]()) extends GameBoard:
 
     @targetName("Add")
@@ -95,7 +94,7 @@ object GameBoard:
 
     override def size: Int =
       board.size
-    
+
     override def find(position: Position): Option[Player] =
       val player = for
         move <- board
@@ -129,9 +128,9 @@ object GameBoard:
       do
         if x != 0 then info += " | "
         info += find(Position(x, y)).map(_.toString).getOrElse(" ")
-        if x == bound then 
-          info += "\n"; 
-          if y != 0 then  
+        if x == bound then
+          info += "\n";
+          if y != 0 then
             for i <- 0 to bound do info += "-- "
             info += "\n"
       info
